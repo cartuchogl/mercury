@@ -1,5 +1,7 @@
 #= require spec_helper
 #= require mercury/core/extensions/object
+#= require extra/querystring
+#= require extra/compare_objects
 
 describe "Object", ->
 
@@ -10,4 +12,13 @@ describe "Object", ->
         arr: [1, 2, {foo: 'bar'}]
         str: 'foo'
         obj: {arr: [1, 2, {foo: 'bar'}], str: 'foo', obj: {bar: 'baz'}}
-      expect( Object.toParams(obj) ).to.eq('arr[][foo]=bar&str=foo&obj[arr][][foo]=bar&obj[str]=foo&obj[obj][bar]=baz')
+
+      expect(__compare_objs(obj, _querystring.parse(Object.toParams(obj)))).to.be.true
+
+    it "need escape for url", ->
+      obj =
+        "ar/r": [1, 2, {"fo;o": 'b&ar'}]
+        "st r": 'fo"o'
+        obj: {arr: [1, 2, {foo: 'bar'}], str: 'fóo', obj: {bar: 'baz'}}
+
+      expect(__compare_objs(obj, _querystring.parse(Object.toParams(obj)))).to.be.true
